@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+  <meta name="theme-color" content="#2563eb"/>
+  <title>Gestión de Clientes y ONUs</title>
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-+ajLtHB9bTy8+bCBUoFW+7P3ZQSpkS2iMJEFq2CfDe8SpPVQCIg1/XxyfJtXgvTb+D8Z+9C/BPE1nv89i4CQSQ==" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+  <!-- Dark‑mode automático -->
+  <script>if(window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.classList.add('dark');}</script>
+  <style>
+    .btn{@apply font-semibold inline-flex items-center justify-center gap-2 py-3 px-6 rounded-full transition active:scale-95 shadow hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none;}
+    .btn-primary{@apply bg-blue-600 text-white hover:bg-blue-700;background-image:linear-gradient(145deg,#4f80e2,#2a67d8);}
+    .btn-success{@apply bg-green-600 text-white hover:bg-green-700;background-image:linear-gradient(145deg,#3fc05f,#2db24e);}
+    .btn-danger{@apply bg-red-600 text-white hover:bg-red-700;background-image:linear-gradient(145deg,#ff6b6b,#ff4b4b);}
+    .btn-whatsapp{@apply text-white hover:bg-green-700;background-image:linear-gradient(145deg,#2cd46d,#1da461);}
+    .btn-info{@apply bg-blue-300 text-blue-800 hover:bg-blue-400;background-image:linear-gradient(145deg,#60a5fa,#3b82f6);}
+    .card{@apply bg-white dark:bg-slate-800 p-5 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-md transition;}
+    .badge{@apply inline-block px-3 py-1 text-xs font-semibold rounded-full;}
+    .badge.completed{@apply bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-400;}
+    .badge.pending{@apply bg-yellow-100 text-yellow-800 dark:bg-yellow-800/20 dark:text-yellow-400;}
+  </style>
+</head>
+<body class="min-h-screen bg-gray-50 dark:bg-slate-900 flex flex-col items-center">
+  <!-- Encabezado -->
+  <header class="w-full bg-white dark:bg-slate-800 sticky top-0 shadow-sm border-b border-gray-200 dark:border-slate-700 z-50">
+    <div class="max-w-lg mx-auto flex items-center justify-center py-4 px-4"><h1 class="text-xl font-bold text-gray-800 dark:text-gray-100">Gestión de Clientes y ONUs</h1></div>
+  </header>
+
+  <!-- Contenido principal -->
+  <main id="app" class="w-full max-w-lg mx-auto flex-grow px-4 py-6 space-y-10">
+    <p id="currentSectionIndicator" class="text-center text-blue-600 dark:text-blue-400 font-bold text-lg flex items-center justify-center gap-2"><i class="fas fa-hand-point-right"></i><span>Estás en: Agregar</span></p>
+
+    <!-- ############## Sección 1: Agregar Cliente ############## -->
+    <section id="sectionAddClient" data-section="Agregar">
+      <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center">Registrar Nuevo Cliente</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <input id="addCedula" type="text" pattern="^[0-9]{6,10}$" title="Solo números, 6‑10 dígitos" placeholder="Cédula*" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 w-full" required/>
+        <input id="addNombre" type="text" placeholder="Nombre*" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 w-full" required/>
+        <input id="addApellido" type="text" placeholder="Apellido*" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 w-full" required/>
+        <input id="addTelefono" type="tel" pattern="^[0-9+\-() ]{7,15}$" title="Teléfono válido" placeholder="Teléfono" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 w-full"/>
+        <input id="addDireccion" type="text" placeholder="Dirección" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 w-full"/>
+        <!-- Select de ONU -->
+        <select id="addSerialONUSelect" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 w-full"><option value="">Selecciona Serial ONU (Opcional)</option><option value="manual_entry">Otro (ingreso manual)</option></select>
+        <input id="addSerialONUManual" type="text" placeholder="Ingresa Serial ONU" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 w-full hidden"/>
+        <!-- GPS -->
+        <p class="text-gray-600 dark:text-gray-400 text-sm mt-2 col-span-full"><span class="font-semibold">GPS:</span> <span id="addGPSLocation">Pendiente…</span></p>
+        <button id="getGPSBtnAddClient" class="btn btn-success col-span-full md:col-auto"><i class="fas fa-map-marker-alt"></i> Obtener GPS</button>
+      </div>
+      <button id="addClientBtn" class="btn btn-primary w-full"><i class="fas fa-user-plus"></i> Registrar Cliente</button>
+    </section>
+
+    <!-- ############## Sección 2: Atender Cliente ############## -->
+    <section id="sectionAttendClient" data-section="Atender" class="hidden">
+      <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center">Atender Cliente</h2>
+      <div class="flex flex-col sm:flex-row gap-3 mb-6"><input id="attendCedulaSearch" type="text" placeholder="Cédula" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 flex-grow" required/><button id="searchClientForAttendBtn" class="btn btn-primary w-full sm:w-auto"><i class="fas fa-search"></i> Buscar</button></div>
+      <div id="attendClientDetails" class="card hidden">
+        <h3 id="attendClientName" class="text-xl font-bold"></h3>
+        <p class="text-gray-700 dark:text-gray-300"><span class="font-semibold">Cédula:</span> <span id="attendClientCedula"></span></p>
+        <p class="text-gray-700 dark:text-gray-300 mb-4"><span class="font-semibold">Serial ONU:</span> <span id="attendClientSerialONU"></span></p>
+        <select id="attendTipoReporte" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 w-full mb-4" required><option value="">Tipo de Reporte</option><option>Activacion</option><option>Migracion</option><option>Mudanza</option><option>Reactivacion</option><option>Retiro_ONU</option><option>Averia</option></select>
+        <textarea id="attendObservacion" rows="4" placeholder="Observación" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 w-full mb-4"></textarea>
+        <input id="attendPhotoInput" type="file" accept="image/*" multiple class="p-2 border border-gray-300 rounded-lg w-full mb-4"/>
+        <button id="recordAttendanceBtn" class="btn btn-success w-full"><i class="fas fa-clipboard-check"></i> Registrar Atención</button>
+      </div>
+    </section>
+
+    <!-- ############## Sección 3: Historial ############## -->
+    <section id="sectionViewClients" data-section="Historial" class="hidden">
+      <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6 text-center">Historial de Clientes</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+        <input id="filterStartDate" type="date" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 w-full"/>
+        <input id="filterEndDate" type="date" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 w-full"/>
+        <select id="filterAttendanceStatus" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 w-full"><option value="all">Todas</option><option value="completed">Completadas</option><option value="pending">Pendientes</option></select>
+        <button id="filterClientsBtn" class="btn btn-primary col-span-full sm:col-auto"><i class="fas fa-filter"></i> Filtrar</button>
+        <button id="clearFilterBtn" class="btn btn-danger col-span-full sm:col-auto"><i class="fas fa-times-circle"></i> Limpiar</button>
+        <button id="shareFilteredClientsBtn" class="btn btn-whatsapp col-span-full sm:col-auto"><i class="fas fa-share-alt"></i> Compartir</button>
+      </div>
+      <div class="card text-center" id="attendanceSummary"><h3 class="text-xl font-bold mb-2">Resumen</h3><p>Totales: <span id="summaryTotal">0</span></p><p>Completadas: <span id="summaryCompleted">0</span></p><p>Pendientes: <span id="summaryPending">0</span></p></div>
+      <div id="clientList" class="space-y-4"></div><p id="noClientsMessage" class="text-center text-gray-500 dark:text-gray-400 hidden">No hay registros.</p>
+    </section>
+
+    <!-- ############## Sección 4: Buscar Cliente ############## -->
+    <section id="sectionSearchClient" data-section="Buscar" class="hidden">
+      <h2 class="text-2xl font-bold text-gray-800 dark:text-gray
